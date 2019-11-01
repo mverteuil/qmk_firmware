@@ -41,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define QMK_LED     E6
 #define QMK_SPEAKER C6
 
+#define AUDIO_CLICKY
 #define AUDIO_VOICES
 #define C6_AUDIO
 
