@@ -19,6 +19,7 @@
 
 enum preonic_layers {
   _QWERTY,
+  _NUMPAD,
   _LOWER,
   _RAISE,
   _ADJUST
@@ -26,32 +27,78 @@ enum preonic_layers {
 
 enum preonic_keycodes {
   QWERTY = SAFE_RANGE,
+  NUMPAD,
   LOWER,
   RAISE,
   BACKLIT
 };
 
+enum tapdance_keycodes {
+  TD_SEMICOLON_COLON,
+  TD_SLASH_QUESTION
+};
+
+/* Tap Dance Definitions */
+qk_tap_dance_action_t tap_dance_actions[] = {
+                          /* Tap once for semicolon, twice for colon */
+  [TD_SEMICOLON_COLON]  = ACTION_TAP_DANCE_DOUBLE(KC_SCOLON, KC_COLON),
+                          /* Tap once for slash, twice for question mark */
+  [TD_SLASH_QUESTION]   = ACTION_TAP_DANCE_DOUBLE(KC_SLASH, KC_QUESTION)
+};
+
+
+/* Keypad aliases */
+#define KC_NAST         KC_KP_ASTERISK
+#define KC_NMIN         KC_KP_MINUS
+#define KC_NPLU         KC_KP_PLUS
+#define KC_NENT         KC_KP_ENTER
+#define KC_NDOT         KC_KP_DOT
+#define TD_SCOL         TD(TD_SEMICOLON_COLON)
+#define TD_SLQU         TD(TD_SLASH_QUESTION)
+
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Qwerty
  * ,-----------------------------------------------------------------------------------.
- * |   `  |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  | Bksp |
+ * |   `  |   !  |   "  |   #  |   $  |   %  |   ^  |   &  |   *  |   _  |   -  | Bksp |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * | Tab  |   Q  |   W  |   E  |   R  |   T  |   Y  |   U  |   I  |   O  |   P  |   "  |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * | Ctrl |   A  |   S  |   D  |   F  |   G  |   H  |   J  |   K  |   L  |   ;  | Enter|
+ * | Ctrl |   A  |   S  |   D  |   F  |   G  |   H  |   J  |   K  |   L  | ;  : | Enter|
  * |------+------+------+------+------+------|------+------+------+------+------+------|
- * | Shift|   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |  Up  |  /   |
+ * | Shift|   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |  Up  | /  ? |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | Brite| Esc  | Alt  | GUI  |Lower |    Space    |Raise |  GUI | Left | Down |Right |
+ * |Numpad| Esc  | Alt  | GUI  |Lower |    Space    |Raise |  GUI | Left | Down |Right |
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_preonic_grid( \
-  KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC, \
+  KC_GRV,  KC_EXLM, KC_DQUO, KC_HASH,KC_DOLLAR,KC_PERCENT,KC_CIRC,KC_AMPR,KC_ASTR, KC_UNDS, KC_MINS, KC_BSPC, \
   KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_QUOT, \
-  KC_LCTRL,KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,  \
-  KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_UP,   KC_SLSH, \
-  BACKLIT, KC_ESC,  KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
+  KC_LCTRL,KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD_SCOL, KC_ENT,  \
+  KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_UP,   TD_SLQU, \
+  NUMPAD,  KC_ESC,  KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
+),
+
+/* Numpad
+ * ,-----------------------------------------------------------------------------------.
+ * |      |      |      |      |      |  Tab |   /  |   *  | Bksp |      |      |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |      |      |   7  |   8  |   9  |   -  |      |      |      |
+ * |------+------+------+------+------+-------------+------+------+------+------+------|
+ * |      |      |      |      |      |   4  |   5  |   6  |   +  |      |      |      |
+ * |------+------+------+------+------+------|------+------+------+------+------+------|
+ * |      |      |      |      |      |   1  |   2  |   3  | Enter|      |      |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |      |      |      0      |   .  | Enter|      |      |      |
+ * `-----------------------------------------------------------------------------------'
+ */
+[_NUMPAD] = LAYOUT_preonic_grid( \
+  _______, _______, _______, _______, _______, KC_TAB,  KC_SLSH, KC_NAST, KC_BSPC, _______, _______, _______,  \
+  _______, _______, _______, _______, _______, KC_KP_7, KC_KP_8, KC_KP_9, KC_NMIN, _______, _______, _______, \
+  _______, _______, _______, _______, _______, KC_KP_4, KC_KP_5, KC_KP_6, KC_NPLU, _______, _______, _______, \
+  _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, KC_NENT, _______, _______, _______, \
+  _______, _______, _______, _______, _______, KC_KP_0, KC_KP_0, KC_NDOT, KC_NENT, _______, _______, _______  \
 ),
 
 /* Lower
@@ -122,6 +169,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
+        case NUMPAD:
+          if (record->event.pressed) {
+            layer_on(_NUMPAD);
+            update_tri_layer(_LOWER, _RAISE, _ADJUST);
+          } else {
+            layer_off(_NUMPAD);
+            update_tri_layer(_LOWER, _RAISE, _ADJUST);
+          }
+          return false;
+          break;
         case LOWER:
           if (record->event.pressed) {
             layer_on(_LOWER);
