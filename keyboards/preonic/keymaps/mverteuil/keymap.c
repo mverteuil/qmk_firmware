@@ -15,10 +15,25 @@
  */
 
 #include QMK_KEYBOARD_H
+
+#include "bad_songs.h"
 #include "muse.h"
+
+/* Keypad aliases */
+#define KC_NAST         KC_KP_ASTERISK
+#define KC_NMIN         KC_KP_MINUS
+#define KC_NPLU         KC_KP_PLUS
+#define KC_NENT         KC_KP_ENTER
+#define KC_NDOT         KC_KP_DOT
+
+/* TapDance Aliases */
+#define TD_NPNR         TD(TD_NUMPAD_NUMBERROW)
+#define TD_SCOL         TD(TD_SEMICOLON_COLON)
+#define TD_SLQU         TD(TD_SLASH_QUESTION)
 
 enum preonic_layers {
   _QWERTY,
+  _NUMBERROW,
   _NUMPAD,
   _LOWER,
   _RAISE,
@@ -34,28 +49,30 @@ enum preonic_keycodes {
 };
 
 enum tapdance_keycodes {
+  TD_NUMPAD_NUMBERROW,
   TD_SEMICOLON_COLON,
   TD_SLASH_QUESTION
 };
 
+enum {
+  SINGLE_TAP = 1,
+  SINGLE_HOLD = 2,
+  DOUBLE_TAP = 3
+};
+
+int get_tapdance_state (qk_tap_dance_state_t *state);
+void td_numpad_numrow_finished (qk_tap_dance_state_t *state, void *user_data);
+void td_numpad_numrow_reset (qk_tap_dance_state_t *state, void *user_data);
+
 /* Tap Dance Definitions */
 qk_tap_dance_action_t tap_dance_actions[] = {
+                          /* Hold for numpad, tap twice to toggle number row */
+  [TD_NUMPAD_NUMBERROW] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_numpad_numrow_finished, td_numpad_numrow_reset),
                           /* Tap once for semicolon, twice for colon */
   [TD_SEMICOLON_COLON]  = ACTION_TAP_DANCE_DOUBLE(KC_SCOLON, KC_COLON),
                           /* Tap once for slash, twice for question mark */
   [TD_SLASH_QUESTION]   = ACTION_TAP_DANCE_DOUBLE(KC_SLASH, KC_QUESTION)
 };
-
-
-/* Keypad aliases */
-#define KC_NAST         KC_KP_ASTERISK
-#define KC_NMIN         KC_KP_MINUS
-#define KC_NPLU         KC_KP_PLUS
-#define KC_NENT         KC_KP_ENTER
-#define KC_NDOT         KC_KP_DOT
-#define TD_SCOL         TD(TD_SEMICOLON_COLON)
-#define TD_SLQU         TD(TD_SLASH_QUESTION)
-
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -69,7 +86,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * | Shift|   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |  Up  | /  ? |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |Numpad| Esc  | Alt  | GUI  |Lower |    Space    |Raise |  GUI | Left | Down |Right |
+ * |NP NRw| Esc  | Alt  | GUI  |Lower |    Space    |Raise |  GUI | Left | Down |Right |
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_preonic_grid( \
@@ -77,7 +94,28 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_QUOT, \
   KC_LCTRL,KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD_SCOL, KC_ENT,  \
   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_UP,   TD_SLQU, \
-  NUMPAD,  KC_ESC,  KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
+  TD_NPNR, KC_ESC,  KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
+),
+
+/* Number Row
+ * ,-----------------------------------------------------------------------------------.
+ * |      |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |      |      |      |      |      |      |      |      |      |
+ * |------+------+------+------+------+-------------+------+------+------+------+------|
+ * |      |      |      |      |      |      |      |      |      |      |      |      |
+ * |------+------+------+------+------+------|------+------+------+------+------+------|
+ * |      |      |      |      |      |      |      |      |      |      |      |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |      |      |      |      |      |      |      |      |      |
+ * `-----------------------------------------------------------------------------------'
+ */
+[_NUMBERROW] = LAYOUT_preonic_grid( \
+  _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    _______, \
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______  \
 ),
 
 /* Numpad
@@ -94,7 +132,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * `-----------------------------------------------------------------------------------'
  */
 [_NUMPAD] = LAYOUT_preonic_grid( \
-  _______, _______, _______, _______, _______, KC_TAB,  KC_SLSH, KC_NAST, KC_BSPC, _______, _______, _______,  \
+  _______, _______, _______, _______, _______, KC_TAB,  KC_SLSH, KC_NAST, KC_BSPC, _______, _______, _______, \
   _______, _______, _______, _______, _______, KC_KP_7, KC_KP_8, KC_KP_9, KC_NMIN, _______, _______, _______, \
   _______, _______, _______, _______, _______, KC_KP_4, KC_KP_5, KC_KP_6, KC_NPLU, _______, _______, _______, \
   _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, KC_NENT, _______, _______, _______, \
@@ -145,40 +183,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Adjust (Lower + Raise)
  * ,-----------------------------------------------------------------------------------.
- * |      |      |      |      |      |             |      |      |      |      |      |
+ * |AudTog|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX| Debug| Reset|
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      | Reset| Debug|Clk on|ClkOff|ClkFq-|ClkFq+|      |TermOn|TermOf|      |      |
+ * |ClkTog|ClkFq-|ClkFq+|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|TermOn|TermOf|
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * |      |      |      |Aud on|AudOff|AGnorm|AGswap|      |      |      |      |      |
+ * |MusTog|Voice- Voice+|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|AGnorm|AGswap|
  * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |      |Voice-|Voice+|Mus on|MusOff|MidiOn|MidOff|      |      |      |      |      |
+ * |MidTog|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |             |      |      |      |      |      |
+ * |XXXXXX|XXXXXX|XXXXXX|XXXXXX|      |             |      |XXXXXX|XXXXXX|XXXXXX|XXXXXX|
  * `-----------------------------------------------------------------------------------'
  */
 [_ADJUST] = LAYOUT_preonic_grid( \
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-  _______, RESET,   DEBUG,   CK_ON,   CK_OFF,  CK_DOWN, CK_UP,   _______, TERM_ON,TERM_OFF, _______, _______, \
-  _______, _______, MU_MOD,  AU_ON,   AU_OFF,  AG_NORM, AG_SWAP, _______, _______, _______, _______, _______, \
-  _______, MUV_DE,  MUV_IN,  MU_ON,   MU_OFF,  MI_ON,   MI_OFF,  _______, _______, _______, _______, _______, \
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______  \
+  AU_TOG,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DEBUG,   RESET,   \
+  CK_TOGG, CK_DOWN, CK_UP,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TERM_ON, TERM_OFF,\
+  MU_TOG,  MUV_DE,  MUV_IN,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, AG_NORM, AG_SWAP, \
+  MI_TOG,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+  MI_TOG,  XXXXXXX, XXXXXXX, XXXXXXX, _______, XXXXXXX, XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX  \
 )
-
 
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-        case NUMPAD:
-          if (record->event.pressed) {
-            layer_on(_NUMPAD);
-            update_tri_layer(_LOWER, _RAISE, _ADJUST);
-          } else {
-            layer_off(_NUMPAD);
-            update_tri_layer(_LOWER, _RAISE, _ADJUST);
-          }
-          return false;
-          break;
         case LOWER:
           if (record->event.pressed) {
             layer_on(_LOWER);
@@ -219,6 +246,50 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
     return true;
 };
+
+/* Global TapDance State */
+static int qk_tap_state;
+
+float s_puzzle[][2] = SONG(BS_ZELDA_PUZZLE);
+
+int get_tapdance_state (qk_tap_dance_state_t *state) {
+  if (state->count == 1) {
+    if (!state->pressed) {
+      return SINGLE_TAP;
+    } else {
+      return SINGLE_HOLD;
+    }
+  } else if (state->count == 2) {
+    return DOUBLE_TAP;
+  }
+  else return 8;
+}
+
+void td_numpad_numrow_finished (qk_tap_dance_state_t *state, void *user_data) {
+  qk_tap_state = get_tapdance_state(state);
+  switch (qk_tap_state) {
+    case SINGLE_HOLD:
+      layer_on(_NUMPAD);
+      break;
+    case DOUBLE_TAP:
+      if (layer_state_is(_NUMBERROW)) {
+        layer_off(_NUMBERROW);;
+        PLAY_SONG(s_puzzle);
+      } else {
+        layer_on(_NUMBERROW);
+        PLAY_SONG(s_puzzle);
+      }
+      break;
+  }
+}
+
+void td_numpad_numrow_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (qk_tap_state) {
+    case SINGLE_HOLD:
+      layer_off(_NUMPAD);
+      break;
+  }
+}
 
 bool muse_mode = false;
 uint8_t last_muse_note = 0;
