@@ -27,6 +27,7 @@
 #define KC_NDOT         KC_KP_DOT
 
 /* TapDance Aliases */
+#define TD_MIEQ         TD(TD_MINUS_EQUALS)
 #define TD_NPNR         TD(TD_NUMPAD_NUMBERROW)
 #define TD_SCOL         TD(TD_SEMICOLON_COLON)
 #define TD_SLQU         TD(TD_SLASH_QUESTION)
@@ -49,6 +50,7 @@ enum preonic_keycodes {
 };
 
 enum tapdance_keycodes {
+  TD_MINUS_EQUALS,
   TD_NUMPAD_NUMBERROW,
   TD_SEMICOLON_COLON,
   TD_SLASH_QUESTION
@@ -66,6 +68,8 @@ void td_numpad_numrow_reset (qk_tap_dance_state_t *state, void *user_data);
 
 /* Tap Dance Definitions */
 qk_tap_dance_action_t tap_dance_actions[] = {
+                          /* Tap once for minus, twice for equals */
+  [TD_MINUS_EQUALS]     = ACTION_TAP_DANCE_DOUBLE(KC_MINUS, KC_EQUAL),
                           /* Hold for numpad, tap twice to toggle number row */
   [TD_NUMPAD_NUMBERROW] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_numpad_numrow_finished, td_numpad_numrow_reset),
                           /* Tap once for semicolon, twice for colon */
@@ -78,7 +82,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Qwerty
  * ,-----------------------------------------------------------------------------------.
- * |   `  |   !  |   "  |   #  |   $  |   %  |   ^  |   &  |   *  |   _  |   -  | Bksp |
+ * |   `  |   !  |   "  |   #  |   $  |   %  |   ^  |   &  |   *  |   _  | -  = | Bksp |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * | Tab  |   Q  |   W  |   E  |   R  |   T  |   Y  |   U  |   I  |   O  |   P  |   "  |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
@@ -90,7 +94,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_preonic_grid( \
-  KC_GRV,  KC_EXLM, KC_DQUO, KC_HASH,KC_DOLLAR,KC_PERCENT,KC_CIRC,KC_AMPR,KC_ASTR, KC_UNDS, KC_MINS, KC_BSPC, \
+  KC_GRV,  KC_EXLM, KC_DQUO, KC_HASH,KC_DOLLAR,KC_PERCENT,KC_CIRC,KC_AMPR,KC_ASTR, KC_UNDS, TD_MIEQ, KC_BSPC, \
   KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_QUOT, \
   KC_LCTRL,KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD_SCOL, KC_ENT,  \
   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_UP,   TD_SLQU, \
