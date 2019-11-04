@@ -204,6 +204,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+float audio_on_song[][2] = AUDIO_ON_SONG;
+
+void audio_on_user() {
+    PLAY_SONG(audio_on_song);
+};
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
         case LOWER:
@@ -250,7 +256,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 /* Global TapDance State */
 static int qk_tap_state;
 
-float s_puzzle[][2] = SONG(BS_ZELDA_PUZZLE);
+float s_numberrow_on[][2] = SONG(BS_TERMINAL_SOUND);
+float s_numberrow_off[][2] = SONG(BS_ONE_UP_SOUND);
 
 int get_tapdance_state (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
@@ -274,10 +281,10 @@ void td_numpad_numrow_finished (qk_tap_dance_state_t *state, void *user_data) {
     case DOUBLE_TAP:
       if (layer_state_is(_NUMBERROW)) {
         layer_off(_NUMBERROW);;
-        PLAY_SONG(s_puzzle);
+        PLAY_SONG(s_numberrow_off);
       } else {
         layer_on(_NUMBERROW);
-        PLAY_SONG(s_puzzle);
+        PLAY_SONG(s_numberrow_on);
       }
       break;
   }

@@ -1,13 +1,15 @@
 #pragma once
 
-#ifdef AUDIO_ENABLE
-    #define STARTUP_SONG SONG(PREONIC_SOUND)
-    // #define STARTUP_SONG SONG(NO_SOUND)
+#include "bad_songs.h"
 
-    #define DEFAULT_LAYER_SONGS { SONG(QWERTY_SOUND), \
-                                  SONG(COLEMAK_SOUND), \
-                                  SONG(DVORAK_SOUND) \
-                                }
+#ifdef AUDIO_ENABLE
+    #define AUDIO_CLICKY_FREQ_MIN 60.0f
+    #define AUDIO_CLICKY_FREQ_DEFAULT 60.0f
+    #define DAC_SAMPLE_MAX 16383U
+
+    #define STARTUP_SONG SONG(BS_OVERWATCH_THEME)
+    #define GOODBYE_SONG SONG(BS_COIN_SOUND)
+    #define AUDIO_ON_SONG SONG(BS_ZELDA_PUZZLE)
 #endif
 
 #define MUSIC_MASK (keycode != KC_NO)
