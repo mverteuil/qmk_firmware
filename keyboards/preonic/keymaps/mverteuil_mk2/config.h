@@ -4,9 +4,10 @@
 #include "song_list.h"
 
 #ifdef AUDIO_ENABLE
-    #define AUDIO_CLICKY_FREQ_MIN 60.0f
-    #define AUDIO_CLICKY_FREQ_DEFAULT 60.0f
-    #define DAC_SAMPLE_MAX 20000U
+    #define AUDIO_CLICKY_FREQ_MIN 61.0f
+    #define AUDIO_CLICKY_FREQ_DEFAULT 61.0f
+    #define AUDIO_CLICKY_DELAY_DURATION 3
+    #define DAC_SAMPLE_MAX 16383U
 
     #define STARTUP_SONG SONG(PLANCK_SOUND)
     #define GOODBYE_SONG SONG(BS_COIN_SOUND)
