@@ -27,10 +27,12 @@
 #define KC_NDOT         KC_KP_DOT
 
 /* TapDance Aliases */
-#define TD_MIEQ         TD(TD_MINUS_EQUALS)
-#define TD_NPNR         TD(TD_NUMPAD_FUNCTIONROW)
+#define TD_NPFR         TD(TD_NUMPAD_FUNCTIONROW)
+#define TD_PLEQ         TD(TD_PLUS_EQUALS)
 #define TD_SCOL         TD(TD_SEMICOLON_COLON)
 #define TD_SLQU         TD(TD_SLASH_QUESTION)
+#define TD_SQDQ         TD(TD_QUOTE_DOUBLEQUOTE)
+#define TD_USMI         TD(TD_UNDERSCORE_MINUS)
 
 enum preonic_layers {
   _QWERTY,
@@ -38,7 +40,7 @@ enum preonic_layers {
   _NUMPAD,
   _LOWER,
   _RAISE,
-  _ADJUST
+  _ADJUST,
 };
 
 enum preonic_keycodes {
@@ -46,14 +48,16 @@ enum preonic_keycodes {
   NUMPAD,
   LOWER,
   RAISE,
-  BACKLIT
+  BACKLIT,
 };
 
 enum tapdance_keycodes {
-  TD_MINUS_EQUALS,
   TD_NUMPAD_FUNCTIONROW,
+  TD_PLUS_EQUALS,
+  TD_QUOTE_DOUBLEQUOTE,
   TD_SEMICOLON_COLON,
-  TD_SLASH_QUESTION
+  TD_SLASH_QUESTION,
+  TD_UNDERSCORE_MINUS,
 };
 
 typedef enum {
@@ -69,37 +73,41 @@ void td_numpad_funcrow_reset (qk_tap_dance_state_t *state, void *user_data);
 
 /* Tap Dance Definitions */
 qk_tap_dance_action_t tap_dance_actions[] = {
-                          /* Tap once for minus, twice for equals */
-  [TD_MINUS_EQUALS]       = ACTION_TAP_DANCE_DOUBLE(KC_MINUS, KC_EQUAL),
+                          /* Tap once for plus, twice for equals */
+  [TD_PLUS_EQUALS]        = ACTION_TAP_DANCE_DOUBLE(KC_PLUS, KC_EQUAL),
                           /* Hold for numpad, tap twice to toggle function row, double hold for temporary function row */
   [TD_NUMPAD_FUNCTIONROW] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_numpad_funcrow_finished, td_numpad_funcrow_reset),
+                          /* Tap once for single quote, twice for double quote */
+  [TD_QUOTE_DOUBLEQUOTE]  = ACTION_TAP_DANCE_DOUBLE(KC_QUOTE, KC_DOUBLE_QUOTE),
                           /* Tap once for semicolon, twice for colon */
   [TD_SEMICOLON_COLON]    = ACTION_TAP_DANCE_DOUBLE(KC_SCOLON, KC_COLON),
                           /* Tap once for slash, twice for question mark */
   [TD_SLASH_QUESTION]     = ACTION_TAP_DANCE_DOUBLE(KC_SLASH, KC_QUESTION)
+                          /* Tap once for underscore, twice for minus */
+  [TD_UNDERSCORE_MINUS]   = ACTION_TAP_DANCE_DOUBLE(KC_UNDERSCORE, KC_MINUS)
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Qwerty
  * ,-----------------------------------------------------------------------------------.
- * | Esc  |   !  |   "  |   #  |   $  |   %  |   ^  |   &  |   *  |   _  | -  = | Bksp |
+ * | Esc  |   !  |   "  |   #  |   $  |   %  |   ^  |   &  |   *  | _  - | +  = | Bksp |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | Tab  |   Q  |   W  |   E  |   R  |   T  |   Y  |   U  |   I  |   O  |   P  |   "  |
+ * | Tab  |   Q  |   W  |   E  |   R  |   T  |   Y  |   U  |   I  |   O  |   P  | '  " |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
  * | Ctrl |   A  |   S  |   D  |   F  |   G  |   H  |   J  |   K  |   L  | ;  : | Enter|
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * | Shift|   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |  Up  | /  ? |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |NP NRw|   `  | Alt  | GUI  |Lower |    Space    |Raise |  GUI | Left | Down |Right |
+ * |NP FRw|   `  | Alt  | GUI  |Lower |    Space    |Raise |  GUI | Left | Down |Right |
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_preonic_grid( \
-  KC_ESC,  KC_EXLM, KC_DQUO, KC_HASH,KC_DOLLAR,KC_PERCENT,KC_CIRC,KC_AMPR,KC_ASTR, KC_UNDS, TD_MIEQ, KC_BSPC, \
-  KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_QUOT, \
+  KC_ESC,  KC_EXLM, KC_DQUO, KC_HASH,KC_DOLLAR,KC_PERCENT,KC_CIRC,KC_AMPR,KC_ASTR, TD_USMI, TD_PLEQ, KC_BSPC, \
+  KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    TD_SQDQ, \
   KC_LCTRL,KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD_SCOL, KC_ENT,  \
   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_UP,   TD_SLQU, \
-  TD_NPNR, KC_GRV,  KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
+  TD_NPFR, KC_GRV,  KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
 ),
 
 /* Function Row
