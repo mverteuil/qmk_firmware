@@ -28,13 +28,13 @@
 
 /* TapDance Aliases */
 #define TD_MIEQ         TD(TD_MINUS_EQUALS)
-#define TD_NPNR         TD(TD_NUMPAD_NUMBERROW)
+#define TD_NPNR         TD(TD_NUMPAD_FUNCTIONROW)
 #define TD_SCOL         TD(TD_SEMICOLON_COLON)
 #define TD_SLQU         TD(TD_SLASH_QUESTION)
 
 enum preonic_layers {
   _QWERTY,
-  _NUMBERROW,
+  _FUNCTIONROW,
   _NUMPAD,
   _LOWER,
   _RAISE,
@@ -51,7 +51,7 @@ enum preonic_keycodes {
 
 enum tapdance_keycodes {
   TD_MINUS_EQUALS,
-  TD_NUMPAD_NUMBERROW,
+  TD_NUMPAD_FUNCTIONROW,
   TD_SEMICOLON_COLON,
   TD_SLASH_QUESTION
 };
@@ -64,19 +64,19 @@ typedef enum {
 } t_tap_state;
 
 t_tap_state get_tapdance_state (qk_tap_dance_state_t *state);
-void td_numpad_numrow_finished (qk_tap_dance_state_t *state, void *user_data);
-void td_numpad_numrow_reset (qk_tap_dance_state_t *state, void *user_data);
+void td_numpad_funcrow_finished (qk_tap_dance_state_t *state, void *user_data);
+void td_numpad_funcrow_reset (qk_tap_dance_state_t *state, void *user_data);
 
 /* Tap Dance Definitions */
 qk_tap_dance_action_t tap_dance_actions[] = {
                           /* Tap once for minus, twice for equals */
-  [TD_MINUS_EQUALS]     = ACTION_TAP_DANCE_DOUBLE(KC_MINUS, KC_EQUAL),
-                          /* Hold for numpad, tap twice to toggle number row, double hold for temporary number row */
-  [TD_NUMPAD_NUMBERROW] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_numpad_numrow_finished, td_numpad_numrow_reset),
+  [TD_MINUS_EQUALS]       = ACTION_TAP_DANCE_DOUBLE(KC_MINUS, KC_EQUAL),
+                          /* Hold for numpad, tap twice to toggle function row, double hold for temporary function row */
+  [TD_NUMPAD_FUNCTIONROW] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_numpad_funcrow_finished, td_numpad_funcrow_reset),
                           /* Tap once for semicolon, twice for colon */
-  [TD_SEMICOLON_COLON]  = ACTION_TAP_DANCE_DOUBLE(KC_SCOLON, KC_COLON),
+  [TD_SEMICOLON_COLON]    = ACTION_TAP_DANCE_DOUBLE(KC_SCOLON, KC_COLON),
                           /* Tap once for slash, twice for question mark */
-  [TD_SLASH_QUESTION]   = ACTION_TAP_DANCE_DOUBLE(KC_SLASH, KC_QUESTION)
+  [TD_SLASH_QUESTION]     = ACTION_TAP_DANCE_DOUBLE(KC_SLASH, KC_QUESTION)
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -102,9 +102,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   TD_NPNR, KC_GRV,  KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
 ),
 
-/* Number Row
+/* Function Row
  * ,-----------------------------------------------------------------------------------.
- * |   `  |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  |      |
+ * |  F12 |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |  F7  |  F8  |  F9  |  F10 |  F11 |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * |      |      |      |      |      |      |      |      |      |      |      |      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
@@ -115,8 +115,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |      |      |      |      |      |      |      |      |      |      |      |      |
  * `-----------------------------------------------------------------------------------'
  */
-[_NUMBERROW] = LAYOUT_preonic_grid( \
-  KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    _______, \
+[_FUNCTIONROW] = LAYOUT_preonic_grid( \
+  KC_F12,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
@@ -146,7 +146,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Lower
  * ,-----------------------------------------------------------------------------------.
- * |  F12 |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |  F7  |  F8  |  F9  |  F10 |  F11 |
+ * |   `  |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  |      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
  * |      |      | Vol+ |      |      |      |      |      |      |      | Play |      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
@@ -158,7 +158,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * `-----------------------------------------------------------------------------------'
  */
 [_LOWER] = LAYOUT_preonic_grid( \
-  KC_F12,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  \
+  KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    _______, \
   _______, _______, KC_VOLU, _______, _______, _______, _______, _______, _______, _______, KC_MPLY, _______, \
   _______, KC_MPRV, KC_VOLD, KC_MNXT, _______, _______, KC_QUES, KC_UNDS, KC_PLUS, _______, _______, _______, \
   _______, _______, _______, _______, _______, _______, _______, KC_MUTE, _______, _______, KC_PGUP, KC_PIPE, \
@@ -261,8 +261,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 /* Global TapDance State */
 static int qk_tap_state;
 
-float s_numberrow_on[][2] = SONG(BS_TERMINAL_SOUND);
-float s_numberrow_off[][2] = SONG(BS_ONE_UP_SOUND);
+float s_functionrow_on[][2] = SONG(BS_TERMINAL_SOUND);
+float s_functionrow_off[][2] = SONG(BS_ONE_UP_SOUND);
 
 t_tap_state get_tapdance_state (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
@@ -281,34 +281,34 @@ t_tap_state get_tapdance_state (qk_tap_dance_state_t *state) {
   else return 8;
 }
 
-void td_numpad_numrow_finished (qk_tap_dance_state_t *state, void *user_data) {
+void td_numpad_funcrow_finished (qk_tap_dance_state_t *state, void *user_data) {
   qk_tap_state = get_tapdance_state(state);
   switch (qk_tap_state) {
     case SINGLE_HOLD:
       layer_on(_NUMPAD);
       break;
     case DOUBLE_HOLD:
-      layer_on(_NUMBERROW);
+      layer_on(_FUNCTIONROW);
       break;
     case DOUBLE_TAP:
-      if (layer_state_is(_NUMBERROW)) {
-        layer_off(_NUMBERROW);;
-        PLAY_SONG(s_numberrow_off);
+      if (layer_state_is(_FUNCTIONROW)) {
+        layer_off(_FUNCTIONROW);;
+        PLAY_SONG(s_functionrow_off);
       } else {
-        layer_on(_NUMBERROW);
-        PLAY_SONG(s_numberrow_on);
+        layer_on(_FUNCTIONROW);
+        PLAY_SONG(s_functionrow_on);
       }
       break;
   }
 }
 
-void td_numpad_numrow_reset (qk_tap_dance_state_t *state, void *user_data) {
+void td_numpad_funcrow_reset (qk_tap_dance_state_t *state, void *user_data) {
   switch (qk_tap_state) {
     case SINGLE_HOLD:
       layer_off(_NUMPAD);
       break;
     case DOUBLE_HOLD:
-      layer_off(_NUMBERROW);
+      layer_off(_FUNCTIONROW);
       break;
   }
 }
