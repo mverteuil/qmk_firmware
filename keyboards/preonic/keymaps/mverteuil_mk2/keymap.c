@@ -20,11 +20,13 @@
 #include "muse.h"
 
 /* Keypad aliases */
+#define KC_DOLR         KC_DOLLAR
 #define KC_NAST         KC_KP_ASTERISK
 #define KC_NMIN         KC_KP_MINUS
 #define KC_NPLU         KC_KP_PLUS
 #define KC_NENT         KC_KP_ENTER
 #define KC_NDOT         KC_KP_DOT
+#define KC_PCNT         KC_PERCENT
 
 /* TapDance Aliases */
 #define TD_NPFR         TD(TD_NUMPAD_FUNCTIONROW)
@@ -82,16 +84,16 @@ qk_tap_dance_action_t tap_dance_actions[] = {
                           /* Tap once for semicolon, twice for colon */
   [TD_SEMICOLON_COLON]    = ACTION_TAP_DANCE_DOUBLE(KC_SCOLON, KC_COLON),
                           /* Tap once for slash, twice for question mark */
-  [TD_SLASH_QUESTION]     = ACTION_TAP_DANCE_DOUBLE(KC_SLASH, KC_QUESTION)
+  [TD_SLASH_QUESTION]     = ACTION_TAP_DANCE_DOUBLE(KC_SLASH, KC_QUESTION),
                           /* Tap once for underscore, twice for minus */
-  [TD_UNDERSCORE_MINUS]   = ACTION_TAP_DANCE_DOUBLE(KC_UNDERSCORE, KC_MINUS)
+  [TD_UNDERSCORE_MINUS]   = ACTION_TAP_DANCE_DOUBLE(KC_UNDERSCORE, KC_MINUS),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Qwerty
  * ,-----------------------------------------------------------------------------------.
- * | Esc  |   !  |   "  |   #  |   $  |   %  |   ^  |   &  |   *  | _  - | +  = | Bksp |
+ * | Esc  |   !  |   @  |   #  |   $  |   %  |   ^  |   &  |   *  | _  - | +  = | Bksp |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * | Tab  |   Q  |   W  |   E  |   R  |   T  |   Y  |   U  |   I  |   O  |   P  | '  " |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
@@ -103,7 +105,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_preonic_grid( \
-  KC_ESC,  KC_EXLM, KC_DQUO, KC_HASH,KC_DOLLAR,KC_PERCENT,KC_CIRC,KC_AMPR,KC_ASTR, TD_USMI, TD_PLEQ, KC_BSPC, \
+  KC_ESC,  KC_EXLM, KC_AT,   KC_HASH, KC_DOLR, KC_PCNT, KC_CIRC, KC_AMPR, KC_ASTR, TD_USMI, TD_PLEQ, KC_BSPC, \
   KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    TD_SQDQ, \
   KC_LCTRL,KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD_SCOL, KC_ENT,  \
   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_UP,   TD_SLQU, \
@@ -217,10 +219,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
-float audio_on_song[][2] = AUDIO_ON_SONG;
+float s_audio_on[][2] = AUDIO_ON_SONG;
 
 void audio_on_user() {
-    PLAY_SONG(audio_on_song);
+    PLAY_SONG(s_audio_on);
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
