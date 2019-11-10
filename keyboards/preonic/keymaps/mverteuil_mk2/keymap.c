@@ -177,23 +177,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Raise
  * ,-----------------------------------------------------------------------------------.
- * |   ~  |   !  |   @  |   #  |   $  |   %  |   ^  |   &  |   *  |   (  |   )  | Del  |
+ * |   ~  |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |  F7  |  F8  |   (  |   )  | Del  |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * |      |      |      |      |      |      |      |      |      |   {  |   }  |      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * |      |      |      |      |      |      |   /  |   -  |   =  |   [  |   ]  |      |
+ * |      |      |      |      |      |      |      |      |      |   [  |   ]  |      |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |      |      |      |      |      |      |      |      |      |      |      |  \   |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |Insert|      |      |      |             |      |      |      |      |      |
+ * |      |      |      |      |      |             |      |      |      |      |      |
  * `-----------------------------------------------------------------------------------'
  */
 [_RAISE] = LAYOUT_preonic_grid( \
-  KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_DEL,  \
+  KC_TILD, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_LPRN, KC_RPRN, KC_DEL,  \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_LCBR, KC_RCBR, _______, \
-  _______, _______, _______, _______, _______, _______, KC_SLSH, KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, _______, \
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_LBRC, KC_RBRC, _______, \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_BSLS, \
-  _______, KC_INS,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______  \
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______  \
 ),
 
 /* Adjust (Lower + Raise)
@@ -220,6 +220,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 float s_audio_on[][2] = AUDIO_ON_SONG;
+float s_layer_lower[][2] = LAYER_LOWER_SONG;
+float s_layer_raise[][2] = LAYER_RAISE_SONG;
 
 void audio_on_user() {
     PLAY_SONG(s_audio_on);
@@ -231,6 +233,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           if (record->event.pressed) {
             layer_on(_LOWER);
             update_tri_layer(_LOWER, _RAISE, _ADJUST);
+            PLAY_SONG(s_layer_lower);
           } else {
             layer_off(_LOWER);
             update_tri_layer(_LOWER, _RAISE, _ADJUST);
@@ -241,6 +244,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           if (record->event.pressed) {
             layer_on(_RAISE);
             update_tri_layer(_LOWER, _RAISE, _ADJUST);
+            PLAY_SONG(s_layer_raise);
           } else {
             layer_off(_RAISE);
             update_tri_layer(_LOWER, _RAISE, _ADJUST);

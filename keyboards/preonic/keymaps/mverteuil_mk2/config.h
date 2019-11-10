@@ -1,15 +1,19 @@
 #pragma once
 
 #include "bad_songs.h"
+#include "song_list.h"
 
 #ifdef AUDIO_ENABLE
     #define AUDIO_CLICKY_FREQ_MIN 60.0f
     #define AUDIO_CLICKY_FREQ_DEFAULT 60.0f
     #define DAC_SAMPLE_MAX 16383U
 
-    #define STARTUP_SONG SONG(BS_OVERWATCH_THEME)
+    #define STARTUP_SONG SONG(PLANCK_SOUND)
     #define GOODBYE_SONG SONG(BS_COIN_SOUND)
     #define AUDIO_ON_SONG SONG(BS_ZELDA_PUZZLE)
+    #define LAYER_LOWER_SONG SONG(NUM_LOCK_ON_SOUND)
+    #define LAYER_RAISE_SONG SONG(NUM_LOCK_OFF_SOUND)
+
 #endif
 
 #define MUSIC_MASK (keycode != KC_NO)
