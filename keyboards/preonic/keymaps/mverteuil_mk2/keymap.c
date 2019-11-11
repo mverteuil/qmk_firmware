@@ -1,4 +1,5 @@
 /* Copyright 2015-2017 Jack Humbert
+ * Copyright 2019 M. de Verteuil
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -275,8 +276,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 /* Global TapDance State */
 static int qk_tap_state;
 
-float s_functionrow_on[][2] = SONG(BS_TERMINAL_SOUND);
-float s_functionrow_off[][2] = SONG(BS_ONE_UP_SOUND);
+float s_functionrow_on[][2] = LAYER_FUNCROW_ON_SONG;
+float s_functionrow_off[][2] = LAYER_FUNCROW_OFF_SONG;
 
 t_tap_state get_tapdance_state (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
