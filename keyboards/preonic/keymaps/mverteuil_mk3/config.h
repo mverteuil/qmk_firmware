@@ -1,27 +1,10 @@
 #pragma once
-
-#include "bad_songs.h"
-#include "song_list.h"
-
 #ifdef AUDIO_ENABLE
     #define AUDIO_CLICKY_DELAY_DURATION 0
     #define AUDIO_CLICKY_FREQ_DEFAULT 100.0f
     #define AUDIO_CLICKY_FREQ_MIN 61.0f
     #define AUDIO_CLICKY_FREQ_RANDOMNESS 0.2f
     #define DAC_SAMPLE_MAX 7000U
-
-
-    #define LOWER_SOUND Q__NOTE(_EF4), W__NOTE(_REST), Q__NOTE(_E2)
-    #define RAISE_SOUND Q__NOTE(_E2), W__NOTE(_REST), Q__NOTE(_EF4)
-
-    #define STARTUP_SONG SONG(WORKMAN_SOUND)
-    #define GOODBYE_SONG SONG(BS_COIN_SOUND)
-    #define AUDIO_ON_SONG SONG(BS_ZELDA_PUZZLE)
-    #define LAYER_FUNCROW_ON_SONG SONG(COLEMAK_SOUND)
-    #define LAYER_FUNCROW_OFF_SONG SONG(QWERTY_SOUND)
-    #define LAYER_LOWER_SONG SONG(LOWER_SOUND)
-    #define LAYER_RAISE_SONG SONG(RAISE_SOUND)
-
 #endif
 
 #define MUSIC_MASK (keycode != KC_NO)

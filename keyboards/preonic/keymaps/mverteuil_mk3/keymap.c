@@ -15,10 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include QMK_KEYBOARD_H
-
-#include "bad_songs.h"
-#include "muse.h"
+#include "mverteuil.h"
 
 /* Keypad aliases */
 #define KC_DOLR         KC_DOLLAR
@@ -30,6 +27,8 @@
 #define KC_PCNT         KC_PERCENT
 
 /* TapDance Aliases */
+#define TD_LBRK         TD(TD_BRACKETS_LEFT)
+#define TD_RBRK         TD(TD_BRACKETS_RIGHT)
 #define TD_CLES         TD(TD_CONTROL_ESCAPE)
 #define TD_NPFR         TD(TD_NUMPAD_FUNCTIONROW)
 #define TD_PLEQ         TD(TD_PLUS_EQUALS)
@@ -37,6 +36,11 @@
 #define TD_SLQU         TD(TD_SLASH_QUESTION)
 #define TD_SQDQ         TD(TD_QUOTE_DOUBLEQUOTE)
 #define TD_USMI         TD(TD_UNDERSCORE_MINUS)
+
+/* Sentinel value for invalid tap dance exit */
+#define TAP_DANCE_NO_MATCH 64
+
+#define TAP_DANCE_BRACKETS_TERM 150
 
 enum preonic_layers {
   _QWERTY,
@@ -56,6 +60,8 @@ enum preonic_keycodes {
 };
 
 enum tapdance_keycodes {
+  TD_BRACKETS_LEFT,
+  TD_BRACKETS_RIGHT,
   TD_CONTROL_ESCAPE,
   TD_NUMPAD_FUNCTIONROW,
   TD_PLUS_EQUALS,
@@ -69,15 +75,33 @@ typedef enum {
   SINGLE_TAP,
   SINGLE_HOLD,
   DOUBLE_TAP,
-  DOUBLE_HOLD
+  DOUBLE_HOLD,
+  TRIPLE_TAP,
+  TRIPLE_HOLD,
 } t_tap_state;
+
+typedef struct {
+  t_tap_state left_brackets;
+  t_tap_state numpad_funcrow;
+  t_tap_state right_brackets;
+} t_tap;
 
 t_tap_state get_tapdance_state (qk_tap_dance_state_t *state);
 void td_numpad_funcrow_finished (qk_tap_dance_state_t *state, void *user_data);
 void td_numpad_funcrow_reset (qk_tap_dance_state_t *state, void *user_data);
+void td_brackets_left_finished (qk_tap_dance_state_t *state, void *user_data);
+void td_brackets_left_reset (qk_tap_dance_state_t *state, void *user_data);
+void td_brackets_right_finished (qk_tap_dance_state_t *state, void *user_data);
+void td_brackets_right_reset (qk_tap_dance_state_t *state, void *user_data);
 
 /* Tap Dance Definitions */
 qk_tap_dance_action_t tap_dance_actions[] = {
+                          /* Tap once for left parenthesis, twice for left bracket, thrice for left brace */
+  [TD_BRACKETS_LEFT]      = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td_brackets_left_finished, td_brackets_left_reset,
+                                                              TAP_DANCE_BRACKETS_TERM),
+                          /* Tap once for right parenthesis, twice for right bracket, thrice for right brace */
+  [TD_BRACKETS_RIGHT]     = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td_brackets_right_finished, td_brackets_right_reset,
+                                                              TAP_DANCE_BRACKETS_TERM),
                           /* Tap once for control, twice for escape */
   [TD_CONTROL_ESCAPE]     = ACTION_TAP_DANCE_DOUBLE(KC_LCTRL, KC_ESCAPE),
                           /* Tap once for plus, twice for equals */
@@ -94,7 +118,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_UNDERSCORE_MINUS]   = ACTION_TAP_DANCE_DOUBLE(KC_UNDERSCORE, KC_MINUS),
 };
 
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
 
 /* Qwerty
  * ,-----------------------------------------------------------------------------------.
@@ -109,12 +133,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |NP FRw| Ctrl | Alt  | GUI  |Lower |    Space    |Raise | /  ? | Left | Down |Right |
  * `-----------------------------------------------------------------------------------'
  */
-[_QWERTY] = LAYOUT_preonic_grid( \
+[_QWERTY] = LAYOUT_preonic_1x2uC ( \
   KC_GRV,  KC_EXLM, KC_AT,   KC_HASH, KC_DOLR, KC_PCNT, KC_CIRC, KC_AMPR, KC_ASTR, TD_USMI, TD_PLEQ, KC_BSPC, \
   KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    TD_SQDQ, \
   TD_CLES, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    TD_SCOL, KC_ENT,  \
   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_UP,   KC_RGUI, \
-  TD_NPFR, KC_LCTL, KC_LALT, KC_LGUI, LOWER,   KC_SPC,  KC_SPC,  RAISE,   TD_SLQU, KC_LEFT, KC_DOWN, KC_RGHT  \
+  TD_NPFR, KC_LCTL, KC_LALT, KC_LGUI, LOWER,        KC_SPC,      RAISE,   TD_SLQU, KC_LEFT, KC_DOWN, KC_RGHT  \
 ),
 
 /* Function Row
@@ -130,12 +154,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |      |      |      |      |      |      |      |      |      |      |      |      |
  * `-----------------------------------------------------------------------------------'
  */
-[_FUNCTIONROW] = LAYOUT_preonic_grid( \
+[_FUNCTIONROW] = LAYOUT_preonic_1x2uC ( \
   KC_F12,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______  \
+  _______, _______, _______, _______, _______,      _______,     _______, _______, _______, _______, _______  \
 ),
 
 /* Numpad
@@ -151,12 +175,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |      |      |      |      |      |      0      |   .  | Enter| Home | PgDn |  End |
  * `-----------------------------------------------------------------------------------'
  */
-[_NUMPAD] = LAYOUT_preonic_grid( \
+[_NUMPAD] = LAYOUT_preonic_1x2uC ( \
   _______, _______, _______, _______, _______, KC_TAB,  KC_SLSH, KC_NAST, KC_BSPC, _______, _______, KC_DEL,  \
   _______, _______, _______, _______, _______, KC_KP_7, KC_KP_8, KC_KP_9, KC_NMIN, _______, _______, _______, \
   _______, _______, _______, _______, _______, KC_KP_4, KC_KP_5, KC_KP_6, KC_NPLU, _______, _______, _______, \
   _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, KC_NENT, KC_CAPS, KC_PGUP, KC_INS,  \
-  _______, _______, _______, _______, _______, KC_KP_0, KC_KP_0, KC_NDOT, KC_NENT, KC_HOME, KC_PGDN, KC_END   \
+  _______, _______, _______, _______, _______,      KC_KP_0,     KC_NDOT, KC_NENT, KC_HOME, KC_PGDN, KC_END   \
 ),
 
 /* Lower
@@ -172,33 +196,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |      |      |      |      |      |             |      |      | Home | PgDn | End  |
  * `-----------------------------------------------------------------------------------'
  */
-[_LOWER] = LAYOUT_preonic_grid( \
+[_LOWER] = LAYOUT_preonic_1x2uC ( \
   KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    _______, \
   _______, _______, KC_VOLU, _______, _______, _______, _______, _______, _______, _______, KC_MPLY, _______, \
   _______, KC_MPRV, KC_VOLD, KC_MNXT, _______, _______, KC_QUES, KC_UNDS, KC_PLUS, _______, _______, _______, \
   _______, _______, _______, _______, _______, _______, _______, KC_MUTE, _______, _______, KC_PGUP, KC_PIPE, \
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_HOME, KC_PGDN, KC_END   \
+  _______, _______, _______, _______,      _______,     _______, _______, _______, KC_HOME, KC_PGDN, KC_END   \
 ),
 
 /* Raise
  * ,-----------------------------------------------------------------------------------.
- * |   ~  |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |  F7  |  F8  |   (  |   )  |      |
+ * |   ~  |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |  F7  |  F8  |      |      |      |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |      |      |   {  |   }  |      |
+ * |      |      |      |      |      |      |      |      |      |      |      |      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |      |      |   [  |   ]  |      |
+ * |      |      |      |      |      |      |      |      |      | [ { (| ) } ]|      |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |      |      |      |      |      |      |      |      |      |      |      |  \   |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * |      |      |      |      |      |             |      |      |      |      |      |
  * `-----------------------------------------------------------------------------------'
  */
-[_RAISE] = LAYOUT_preonic_grid( \
-  KC_TILD, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_LPRN, KC_RPRN, _______,  \
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_LCBR, KC_RCBR, _______, \
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_LBRC, KC_RBRC, _______, \
+[_RAISE] = LAYOUT_preonic_1x2uC ( \
+  KC_TILD, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______, \
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, TD_LBRK, TD_RBRK, _______, \
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_BSLS, \
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______  \
+  _______, _______, _______, _______, _______,      _______,     _______, _______, _______, _______, _______  \
 ),
 
 /* Adjust (Lower + Raise)
@@ -214,12 +238,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |XXXXXX|XXXXXX|XXXXXX|XXXXXX|      |             |      |XXXXXX|XXXXXX|XXXXXX|XXXXXX|
  * `-----------------------------------------------------------------------------------'
  */
-[_ADJUST] = LAYOUT_preonic_grid( \
+[_ADJUST] = LAYOUT_preonic_1x2uC ( \
   AU_TOG,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DEBUG,   RESET,   \
   CK_TOGG, CK_DOWN, CK_UP,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TERM_ON, TERM_OFF,\
   MU_TOG,  MUV_DE,  MUV_IN,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, AG_NORM, AG_SWAP, \
   MI_TOG,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, XXXXXXX, XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX  \
+  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,      XXXXXXX,     _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX  \
 )
 
 };
@@ -233,6 +257,7 @@ void audio_on_user() {
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
   switch (keycode) {
         case LOWER:
           if (record->event.pressed) {
@@ -278,10 +303,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 };
 
 /* Global TapDance State */
-static int qk_tap_state;
+static t_tap qk_tap_state = {
+    .left_brackets = 0,
+    .numpad_funcrow = 0,
+    .right_brackets = 0,
+};
 
 float s_functionrow_on[][2] = LAYER_FUNCROW_ON_SONG;
 float s_functionrow_off[][2] = LAYER_FUNCROW_OFF_SONG;
+float s_numpad_toggle[][2] = LAYER_NMPAD_SONG;
 
 t_tap_state get_tapdance_state (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
@@ -296,15 +326,22 @@ t_tap_state get_tapdance_state (qk_tap_dance_state_t *state) {
     } else {
       return DOUBLE_HOLD;
     }
+  } else if (state->count == 3) {
+    if (!state->pressed) {
+       return TRIPLE_TAP;
+    } else {
+       return TRIPLE_HOLD;
+    }
   }
-  else return 8;
+  else return TAP_DANCE_NO_MATCH;
 }
 
 void td_numpad_funcrow_finished (qk_tap_dance_state_t *state, void *user_data) {
-  qk_tap_state = get_tapdance_state(state);
-  switch (qk_tap_state) {
+  qk_tap_state.numpad_funcrow = get_tapdance_state(state);
+  switch (qk_tap_state.numpad_funcrow) {
     case SINGLE_HOLD:
       layer_on(_NUMPAD);
+      PLAY_SONG(s_numpad_toggle);
       break;
     case DOUBLE_HOLD:
       layer_on(_FUNCTIONROW);
@@ -318,18 +355,61 @@ void td_numpad_funcrow_finished (qk_tap_dance_state_t *state, void *user_data) {
         PLAY_SONG(s_functionrow_on);
       }
       break;
+    default: break;
   }
 }
 
 void td_numpad_funcrow_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (qk_tap_state) {
+  switch (qk_tap_state.numpad_funcrow) {
     case SINGLE_HOLD:
       layer_off(_NUMPAD);
       break;
     case DOUBLE_HOLD:
       layer_off(_FUNCTIONROW);
       break;
+    default: break;
   }
+}
+
+
+void td_brackets_left_finished (qk_tap_dance_state_t *state, void *user_data) {
+  qk_tap_state.left_brackets = get_tapdance_state(state);
+  switch (qk_tap_state.left_brackets) {
+      case SINGLE_TAP: register_left_paren(); break;
+      case DOUBLE_TAP: register_code(KC_LBRC); break;
+      case TRIPLE_TAP: register_left_brace(); break;
+      default: break;
+  }
+}
+
+void td_brackets_left_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (qk_tap_state.left_brackets) {
+      case SINGLE_TAP: unregister_left_paren(); break;
+      case DOUBLE_TAP: unregister_code(KC_LBRC); break;
+      case TRIPLE_TAP: unregister_left_brace(); break;
+      default: break;
+  }
+  qk_tap_state.left_brackets = 0;
+}
+
+void td_brackets_right_finished (qk_tap_dance_state_t *state, void *user_data) {
+  qk_tap_state.right_brackets = get_tapdance_state(state);
+  switch (qk_tap_state.right_brackets) {
+      case SINGLE_TAP: register_right_paren(); break;
+      case DOUBLE_TAP: register_code(KC_RBRC); break;
+      case TRIPLE_TAP: register_right_brace(); break;
+      default: break;
+  }
+}
+
+void td_brackets_right_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (qk_tap_state.right_brackets) {
+      case SINGLE_TAP: unregister_right_paren(); break;
+      case DOUBLE_TAP: unregister_code(KC_RBRC); break;
+      case TRIPLE_TAP: unregister_right_brace(); break;
+      default: break;
+  }
+  qk_tap_state.right_brackets = 0;
 }
 
 bool muse_mode = false;
