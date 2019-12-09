@@ -40,8 +40,6 @@
 /* Sentinel value for invalid tap dance exit */
 #define TAP_DANCE_NO_MATCH 64
 
-#define TAP_DANCE_BRACKETS_TERM 150
-
 enum preonic_layers {
   _QWERTY,
   _FUNCTIONROW,
@@ -97,11 +95,9 @@ void td_brackets_right_reset (qk_tap_dance_state_t *state, void *user_data);
 /* Tap Dance Definitions */
 qk_tap_dance_action_t tap_dance_actions[] = {
                           /* Tap once for left parenthesis, twice for left bracket, thrice for left brace */
-  [TD_BRACKETS_LEFT]      = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td_brackets_left_finished, td_brackets_left_reset,
-                                                              TAP_DANCE_BRACKETS_TERM),
+  [TD_BRACKETS_LEFT]      = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_brackets_left_finished, td_brackets_left_reset),
                           /* Tap once for right parenthesis, twice for right bracket, thrice for right brace */
-  [TD_BRACKETS_RIGHT]     = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td_brackets_right_finished, td_brackets_right_reset,
-                                                              TAP_DANCE_BRACKETS_TERM),
+  [TD_BRACKETS_RIGHT]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_brackets_right_finished, td_brackets_right_reset),
                           /* Tap once for control, twice for escape */
   [TD_CONTROL_ESCAPE]     = ACTION_TAP_DANCE_DOUBLE(KC_LCTRL, KC_ESCAPE),
                           /* Tap once for plus, twice for equals */
@@ -151,7 +147,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |      |      |      |      |      |      |      |      |      |      |      |      |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |      |      |      |      |      |
+ * |      |      |      |      |      |             |      |      |      |      |      |
  * `-----------------------------------------------------------------------------------'
  */
 [_FUNCTIONROW] = LAYOUT_preonic_1x2uC ( \
@@ -164,23 +160,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
 
 /* Numpad
  * ,-----------------------------------------------------------------------------------.
- * |      |      |      |      |      |  Tab |   /  |   *  | Bksp |      |      | Del  |
+ * |      |      |      |      |      |      |      |  Tab |   /  |   *  | Bksp | Del  |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |   7  |   8  |   9  |   -  |      |      |      |
+ * |      |      |      |      |      |      |      |   7  |   8  |   9  |   -  |      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * |      |      |      |      |      |   4  |   5  |   6  |   +  |      |      |      |
+ * |      |      |      |      |      |      |      |   4  |   5  |   6  |   +  |      |
  * |------+------+------+------+------+------|------+------+------+------+------+------|
- * |      |      |      |      |      |   1  |   2  |   3  | Enter| CpLk | PgUp |Insert|
+ * |      |      |      |      |      |      |      |   1  |   2  |   3  | PgUp |Insert|
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |      0      |   .  | Enter| Home | PgDn |  End |
+ * |      |      |      |      |      |             |   0  |   .  | Home | PgDn |  End |
  * `-----------------------------------------------------------------------------------'
  */
 [_NUMPAD] = LAYOUT_preonic_1x2uC ( \
-  _______, _______, _______, _______, _______, KC_TAB,  KC_SLSH, KC_NAST, KC_BSPC, _______, _______, KC_DEL,  \
-  _______, _______, _______, _______, _______, KC_KP_7, KC_KP_8, KC_KP_9, KC_NMIN, _______, _______, _______, \
-  _______, _______, _______, _______, _______, KC_KP_4, KC_KP_5, KC_KP_6, KC_NPLU, _______, _______, _______, \
-  _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, KC_NENT, KC_CAPS, KC_PGUP, KC_INS,  \
-  _______, _______, _______, _______, _______,      KC_KP_0,     KC_NDOT, KC_NENT, KC_HOME, KC_PGDN, KC_END   \
+  _______, _______, _______, _______, _______, _______, _______, KC_TAB,  KC_SLSH, KC_NAST, KC_BSPC, KC_DEL,  \
+  _______, _______, _______, _______, _______, _______, _______, KC_KP_7, KC_KP_8, KC_KP_9, KC_NMIN, _______, \
+  _______, _______, _______, _______, _______, _______, _______, KC_KP_4, KC_KP_5, KC_KP_6, KC_NPLU, _______, \
+  _______, _______, _______, _______, _______, _______, _______, KC_KP_1, KC_KP_2, KC_KP_3, KC_PGUP, KC_INS,  \
+  _______, _______, _______, _______, _______,     _______,      KC_KP_0, KC_NDOT, KC_HOME, KC_PGDN, KC_END   \
 ),
 
 /* Lower
@@ -201,7 +197,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
   _______, _______, KC_VOLU, _______, _______, _______, _______, _______, _______, _______, KC_MPLY, _______, \
   _______, KC_MPRV, KC_VOLD, KC_MNXT, _______, _______, KC_QUES, KC_UNDS, KC_PLUS, _______, _______, _______, \
   _______, _______, _______, _______, _______, _______, _______, KC_MUTE, _______, _______, KC_PGUP, KC_PIPE, \
-  _______, _______, _______, _______,      _______,     _______, _______, _______, KC_HOME, KC_PGDN, KC_END   \
+  _______, _______, _______, _______, _______,     _______,      _______, _______, KC_HOME, KC_PGDN, KC_END   \
 ),
 
 /* Raise
@@ -315,19 +311,19 @@ float s_numpad_toggle[][2] = LAYER_NMPAD_SONG;
 
 t_tap_state get_tapdance_state (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
-    if (!state->pressed) {
+    if (state->interrupted || !state->pressed) {
       return SINGLE_TAP;
     } else {
       return SINGLE_HOLD;
     }
   } else if (state->count == 2) {
-    if (!state->pressed) {
+    if (state->interrupted || !state->pressed) {
       return DOUBLE_TAP;
     } else {
       return DOUBLE_HOLD;
     }
   } else if (state->count == 3) {
-    if (!state->pressed) {
+    if (state->interrupted || !state->pressed) {
        return TRIPLE_TAP;
     } else {
        return TRIPLE_HOLD;
@@ -339,7 +335,7 @@ t_tap_state get_tapdance_state (qk_tap_dance_state_t *state) {
 void td_numpad_funcrow_finished (qk_tap_dance_state_t *state, void *user_data) {
   qk_tap_state.numpad_funcrow = get_tapdance_state(state);
   switch (qk_tap_state.numpad_funcrow) {
-    case SINGLE_HOLD:
+    case SINGLE_TAP ... SINGLE_HOLD:
       layer_on(_NUMPAD);
       PLAY_SONG(s_numpad_toggle);
       break;
