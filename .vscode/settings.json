@@ -20,6 +20,18 @@
       "hash_set": "c",
       "map": "c",
       "set": "c",
-      "unordered_map": "c"
-    }
+      "unordered_map": "c",
+      "algorithm": "c",
+      "complex": "c",
+      "new": "c",
+      "__locale": "c",
+      "locale": "c"
+    },
+    "favorites.resources": [
+      "keyboards/knops/mini",
+      "keyboards/massdrop/ctrl",
+      "keyboards/preonic",
+      "keyboards/boardwalk",
+      "users/mverteuil"
+    ]
 }

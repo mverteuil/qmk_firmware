@@ -18,7 +18,12 @@
 #define CONFIG_USER_H
 
 #include "../../config.h"
+#include "bad_songs.h"
 
-// place overrides here
-
+#define AUDIO_CLICKY
+#define B5_AUDIO
+#define C6_AUDIO
+#define STARTUP_SONG SONG(BS_ZELDA_PUZZLE)
+#define GOODBYE_SONG SONG(BS_COIN_SOUND)
 #endif
+

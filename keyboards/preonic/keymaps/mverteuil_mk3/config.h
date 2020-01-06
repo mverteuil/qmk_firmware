@@ -5,6 +5,8 @@
     #define AUDIO_CLICKY_FREQ_MIN 61.0f
     #define AUDIO_CLICKY_FREQ_RANDOMNESS 0.2f
     #define DAC_SAMPLE_MAX 7000U
+    #define STARTUP_SOUND SONG(WORKMAN_SOUND)
+    #define GOODBYE_SONG SONG(BS_COIN_SOUND)
 #endif
 
 #define MUSIC_MASK (keycode != KC_NO)
