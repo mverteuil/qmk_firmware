@@ -1,3 +1,5 @@
 SRC += muse.c
-MIDI_ENABLE = yes            # MIDI controls
+
+AUDIO_ENABLE = yes
+MIDI_ENABLE = yes
 TAP_DANCE_ENABLE = yes

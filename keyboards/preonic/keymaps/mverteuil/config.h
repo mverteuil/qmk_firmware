@@ -1,15 +1,15 @@
-#pragma once
-
-#include "bad_songs.h"
-
 #ifdef AUDIO_ENABLE
-    #define AUDIO_CLICKY_FREQ_MIN 60.0f
-    #define AUDIO_CLICKY_FREQ_DEFAULT 60.0f
-    #define DAC_SAMPLE_MAX 16383U
+    #if __has_include("copyright.h")
+    #include "copyright.h"
+    #endif
 
-    #define STARTUP_SONG SONG(BS_OVERWATCH_THEME)
-    #define GOODBYE_SONG SONG(BS_COIN_SOUND)
-    #define AUDIO_ON_SONG SONG(BS_ZELDA_PUZZLE)
+    #define AUDIO_CLICKY_DELAY_DURATION 0
+    #define AUDIO_CLICKY_FREQ_DEFAULT 100.0f
+    #define AUDIO_CLICKY_FREQ_MIN 61.0f
+    #define AUDIO_CLICKY_FREQ_RANDOMNESS 0.2f
+    #define DAC_SAMPLE_MAX 7000U
+    #define STARTUP_SONG SONG(WORKMAN_SOUND)
+    #define GOODBYE_SONG SONG(COIN_SOUND)
 #endif
 
 #define MUSIC_MASK (keycode != KC_NO)
