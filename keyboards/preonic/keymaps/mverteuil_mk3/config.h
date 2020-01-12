@@ -1,14 +1,19 @@
-#pragma once
 #ifdef AUDIO_ENABLE
+    #include "copyright.h"
+
     #define AUDIO_CLICKY_DELAY_DURATION 0
     #define AUDIO_CLICKY_FREQ_DEFAULT 100.0f
     #define AUDIO_CLICKY_FREQ_MIN 61.0f
     #define AUDIO_CLICKY_FREQ_RANDOMNESS 0.2f
     #define DAC_SAMPLE_MAX 7000U
-    #define STARTUP_SOUND SONG(WORKMAN_SOUND)
-    #define GOODBYE_SONG SONG(BS_COIN_SOUND)
+    #define STARTUP_SONG SONG(WORKMAN_SOUND)
+    #define GOODBYE_SONG SONG(COIN_SOUND)
 #endif
 
+#undef RGBLED_NUM
+#define RGBLED_NUM 9
+#define RGBLIGHT_LIMIT_VAL 200
+#define RGBLIGHT_LED_MAP { 8,1,3,2,4,6,5,7,0}
 #define MUSIC_MASK (keycode != KC_NO)
 
 /*
