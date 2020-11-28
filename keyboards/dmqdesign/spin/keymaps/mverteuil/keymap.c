@@ -51,10 +51,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         RGB_TOG, RGB_MOD, RGB_M_P
     ),
     [_MINECRAFT] = LAYOUT(
-        KC_7,    KC_8,    KC_9,    _______,
-        KC_4,    KC_5,    KC_6,    _______,
-        KC_1,    KC_2,    KC_3,    _______,
-        KC_0,    RGB_TOG, KC_ENT
+        KC_RCTL, KC_ROPT, KC_RCMD, _______,
+        KC_BTN5, KC_DEL,  KC_PDOT, _______,
+        KC_NLCK, KC_PSLS, KC_NUBS, _______,
+        KC_APP,  KC_PEQL, KC_BTN4
     )
 };
 
