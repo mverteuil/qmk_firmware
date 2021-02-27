@@ -1,2 +1,4 @@
+USER_NAME := mverteuil
+
 MOUSEKEY_ENABLE = yes
 BOOTMAGIC_ENABLE = lite
