@@ -46,6 +46,9 @@ enum preonic_keycodes {
     QWERTY = SAFE_RANGE,
     LOWER,
     RAISE,
+    SPCSPAM,
+    MOUSE1H,
+    MS2SPAM,
 };
 
 enum tapdance_keycodes {
@@ -103,6 +106,14 @@ qk_tap_dance_action_t tap_dance_actions[] = {
     [TD_UNDERSCORE_MINUS] = ACTION_TAP_DANCE_DOUBLE(KC_UNDERSCORE, KC_MINUS),
 };
 
+/* Jetpack Spacebar spamming */
+static bool is_spam_space_active  = false;
+static bool is_spam_mouse2_active = false;
+uint16_t    spam_timer            = 0;
+
+/* Click and hold */
+static bool is_lclick_and_hold_active = false;
+
 /* clang-format off */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -116,7 +127,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * | Shift|   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |   /  |Shift |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | \  | |^Numbr| Alt  | GUI  |Lower |    Space    |Raise | Left | Down | Up   |Right |
+ * | Jetpk|^Numbr| Alt  | GUI  |Lower |    Space    |Raise | Left | Down | Up   |Right |
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = LAYOUT_preonic_1x2uC (
@@ -124,7 +135,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_QUOT,
   TD_CLES, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,
   KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,   KC_RSFT,
-  TD_BSPI, NUMBERS, KC_LALT, KC_LGUI, LOWER,        KC_SPC,      RAISE,   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
+  SPCSPAM, NUMBERS, KC_LALT, KC_LGUI, LOWER,        KC_SPC,      RAISE,   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT
 ),
 
 /* Numpad Numbers
@@ -137,7 +148,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |      |      |      |      |      |      |      |      |      |  N.  |      |RCtrl |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |             |      |Insert|PrtScr|Pause |Menu  |
+ * |  \ | |      |HoldM1|HoldM1|      |  Mouse2Spam |      |Insert|PrtScr|Pause |Menu  |
  * `-----------------------------------------------------------------------------------'
  */
 [_NUMBERS] = LAYOUT_preonic_1x2uC (
@@ -145,7 +156,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
   _______, _______, _______, _______, _______, _______, _______, KC_PMNS, KC_PPLS, KC_PAST, KC_PSLS, KC_PENT,
   _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_PDOT, _______, KC_RCTL,
-  _______, _______, _______, _______, _______,      _______,     _______, KC_INS,  KC_PSCR, KC_PAUS, KC_MENU
+  TD_BSPI, _______, MOUSE1H, MOUSE1H, _______,      MS2SPAM,     _______, KC_INS,  KC_PSCR, KC_PAUS, KC_MENU
 ),
 
 /* Lower
@@ -192,7 +203,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Adjust (Lower + Raise)
  * ,-----------------------------------------------------------------------------------.
- * |AudTog|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX| Debug| Reset|
+ * |AudTog|RgbTog|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX| Debug| Reset|
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * |ClkTog|ClkFq-|ClkFq+|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|XXXXXX|TermOn|TermOf|
  * |------+------+------+------+------+-------------+------+------+------+------+------|
@@ -200,24 +211,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |MidTog|Rplain|Rbreat|Rrainb|Rswirl|Rsnake|Rkridr|Rxmas |Rgrad |RGBtst|XXXXXX|Shift |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |RGBmod|RGBhue|RBGsat|RGBval|      |             |      |XXXXXX|XXXXXX|XXXXXX|XXXXXX|
+ * |RGBmod|RGBhue|RBGsat|RGBval|      |    Jetpack  |      |XXXXXX|XXXXXX|XXXXXX|XXXXXX|
  * `-----------------------------------------------------------------------------------'
  */
 [_ADJUST] = LAYOUT_preonic_1x2uC (
-  AU_TOG,  XXXXXXX, XXXXXXX, XXXXXXX, RGB_HUI, RGB_HUD, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DEBUG,   RESET,
+  AU_TOG,  RGB_TOG, XXXXXXX, XXXXXXX, RGB_HUI, RGB_HUD, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DEBUG,   RESET,
   CK_TOGG, CK_DOWN, CK_UP,   XXXXXXX, RGB_SAI, RGB_SAD, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TERM_ON, TERM_OFF,
   MU_TOG,  MUV_DE,  MUV_IN,  XXXXXXX, RGB_VAI, RGB_VAD, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, AG_NORM, AG_SWAP,
   MI_TOG,  RGB_M_P, RGB_M_B, RGB_M_R,RGB_M_SW,RGB_M_SN, RGB_M_K, RGB_M_X, RGB_M_G, RGB_M_T, RGB_SPI, KC_LSHIFT,
-  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,      RGB_TOG,     _______, XXXXXXX,RGB_RMOD, RGB_SPD, RGB_MOD
+  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,      _______,     _______, XXXXXXX,RGB_RMOD, RGB_SPD, RGB_MOD
 )
 
 };
 /* clang-format on */
 
-float s_audio_on[][2]    = AUDIO_ON_SONG;
-float s_layer_lower[][2] = LAYER_LOWER_SONG;
-float s_layer_numbers[][2]  = LAYER_NUMBERS_SONG;
-float s_layer_raise[][2] = LAYER_RAISE_SONG;
+float s_audio_on[][2]      = AUDIO_ON_SONG;
+float s_layer_lower[][2]   = LAYER_LOWER_SONG;
+float s_layer_numbers[][2] = LAYER_NUMBERS_SONG;
+float s_layer_raise[][2]   = LAYER_RAISE_SONG;
 
 void audio_on_user() { PLAY_SONG(s_audio_on); };
 
@@ -245,6 +256,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
             break;
+        case SPCSPAM:
+            is_spam_space_active = record->event.pressed;
+            spam_timer           = timer_read();
+            return false;
+            break;
+        case MS2SPAM:
+            if (record->event.pressed) {
+                is_spam_mouse2_active = !is_spam_mouse2_active;
+                spam_timer            = timer_read();
+                return false;
+                break;
+            }
+        case MOUSE1H:
+            if (record->event.pressed) {
+                is_lclick_and_hold_active = !is_lclick_and_hold_active;
+                if (is_lclick_and_hold_active) {
+                    register_code(KC_BTN1);
+                } else {
+                    unregister_code(KC_BTN1);
+                }
+            }
+            return false;
+            break;
     }
     return true;
 };
@@ -254,7 +288,6 @@ static t_tap qk_tap_state = {
     .left_brackets  = 0,
     .right_brackets = 0,
 };
-
 
 t_tap_state get_tapdance_state(qk_tap_dance_state_t *state) {
     if (state->count == 1) {
@@ -278,7 +311,6 @@ t_tap_state get_tapdance_state(qk_tap_dance_state_t *state) {
     } else
         return TAP_DANCE_NO_MATCH;
 }
-
 
 void td_brackets_left_finished(qk_tap_dance_state_t *state, void *user_data) {
     qk_tap_state.left_brackets = get_tapdance_state(state);
@@ -348,73 +380,19 @@ void td_brackets_right_reset(qk_tap_dance_state_t *state, void *user_data) {
     qk_tap_state.right_brackets = 0;
 }
 
-bool     muse_mode      = false;
-uint8_t  last_muse_note = 0;
-uint16_t muse_counter   = 0;
-uint8_t  muse_offset    = 70;
-uint16_t muse_tempo     = 50;
-
-void encoder_update_user(uint8_t index, bool clockwise) {
-    if (muse_mode) {
-        if (IS_LAYER_ON(_RAISE)) {
-            if (clockwise) {
-                muse_offset++;
-            } else {
-                muse_offset--;
-            }
-        } else {
-            if (clockwise) {
-                muse_tempo += 1;
-            } else {
-                muse_tempo -= 1;
-            }
-        }
-    } else {
-        if (clockwise) {
-            tap_code(KC_PGDN);
-        } else {
-            tap_code(KC_PGUP);
-        }
-    }
-}
-
-void dip_switch_update_user(uint8_t index, bool active) {
-    switch (index) {
-        case 0:
-            if (active) {
-                layer_on(_ADJUST);
-            } else {
-                layer_off(_ADJUST);
-            }
-            break;
-        case 1:
-            if (active) {
-                muse_mode = true;
-            } else {
-                muse_mode = false;
-            }
-    }
-}
-
 void matrix_scan_user(void) {
-#ifdef AUDIO_ENABLE
-    if (muse_mode) {
-        if (muse_counter == 0) {
-            uint8_t muse_note = muse_offset + SCALE[muse_clock_pulse()];
-            if (muse_note != last_muse_note) {
-                stop_note(compute_freq_for_midi_note(last_muse_note));
-                play_note(compute_freq_for_midi_note(muse_note), 0xF);
-                last_muse_note = muse_note;
-            }
+    if (is_spam_space_active) {
+        if (timer_elapsed(spam_timer) > 500) {
+            tap_code(KC_SPC);
         }
-        muse_counter = (muse_counter + 1) % muse_tempo;
-    } else {
-        if (muse_counter) {
-            stop_all_notes();
-            muse_counter = 0;
+    } else if (is_spam_mouse2_active) {
+        if (timer_elapsed(spam_timer) > 1500) {
+            tap_code(KC_BTN2);
         }
     }
-#endif
+    if (is_lclick_and_hold_active) {
+        register_code(KC_BTN1);
+    }
 }
 
 bool music_mask_user(uint16_t keycode) {
